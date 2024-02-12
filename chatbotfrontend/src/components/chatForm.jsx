@@ -8,23 +8,24 @@ const ChatForm = styled('div')({
     display: 'flex',
     flexDirection: 'column',
     
-    backgroundColor: '#3887BE',
+    backgroundColor: '#0F1035',
     alignItems: 'center',
-  
- 
-  
-    borderRadius: 3,
 
-   
+    minWidth: '350px',
+  
+    borderRadius: 2,
+
+    boxShadow: '0px 0px 10px 5px rgba(12,10,128,0.25)',
+    border: '2px solid #211C6A',
 });
 
 
 const ChatButton = styled(Button)({
 
     borderRadius: '0',
-    backgroundColor: '#213555',
+    backgroundColor: '#211C6A',
 
-    height: '43px'
+    height: '46px'
 });
 
 const InputField = styled(Input)({
@@ -33,7 +34,7 @@ const InputField = styled(Input)({
  
     color: 'black',
  
-    padding: 5,
+    padding: 6,
     backgroundColor: 'white'
 });
 
@@ -44,174 +45,74 @@ const InputField = styled(Input)({
 async function getResponseFromBot(message) {
     const gptResponse = await axios.post(`https://localhost:44366/api/gpt?message=${message}`);
     return gptResponse.data;
-} 
-
+}
 
 function Chatform() {
-    const [chatState, setChatState] = useState({
-        message: '',
-        chatHistory: [],
-        replyHistory: []
-    });
-
-    const handleMessageChange = (event) => {
-        setChatState(prevState => ({
-            ...prevState,
-            message: event.target.value
-        }));
-    };
-
-
-    const handleSubmit = async () => {
-        if (chatState.message.trim() !== '') {
-            setChatState(prevState => ({
-                ...prevState,
-                chatHistory: [...prevState.chatHistory, chatState.message]
-            }));
-
-             putAreply(chatState.message);
-
-            setChatState(prevState => ({
-                ...prevState,
-                message: ''
-            }));
-        }
-    };
-
-
-    const putAreply = async (message) => {
-        const response = await getResponseFromBot(message);
-        setChatState(prevState => ({
-            ...prevState,
-            replyHistory: [...prevState.replyHistory, response]
-        }));
-    };
-
-    /*
- 
-
-
-
-    function Chatform() {
     const [message, setMessage] = useState('');
     const [chatHistory, setChatHistory] = useState([]);
-    const [replyHistory, setReplyHistory] = useState([]);
 
-    const handleMessageChange = (event) => {
+    const MessageChanged = (event) => {
         setMessage(event.target.value);
     };
 
-    const handleSubmit = async () => {
+    const SubmitMessage = () => {
         if (message.trim() !== '') {
-            setChatHistory([...chatHistory, message]);
-
-           
-            putAreply(message);
-
+            const newM = { id: Date.now(), message: message, reply: null };
+            setChatHistory([...chatHistory, newM]);
             setMessage('');
+            sendMandGetit(newM);
         }
     };
 
-      const putAreply = async (message) => {
-        const response = await getResponseFromBot(message);
-        setReplyHistory([...replyHistory, response]);
+    const sendMandGetit = async (newMessage) => {
+        const response = await getResponseFromBot(newMessage.message);
+        
+        setChatHistory(prevChatHistory => {
+            return prevChatHistory.map(item => {
+                if (item.id === newMessage.id) {
+                    return { ...item, reply: response };
+                }
+                return item;
+            });
+        });
     };
 
-
-
-
-          {replyHistory.map((reply, index) =>
-                         ( 
-
-                             <div style={{ display: 'table', width: 'fit - content', backgroundColor: '#1B1A55', marginLeft: '5px', padding: '5px 15px 5px 5px', borderRadius: '10px', margin: '5px 0 0 5px',maxWidth : '200px' }} key={index}>
-                            {reply}
-                        </div>
-
-
-
-                         ))}
-
-    */
-
-
-
-
-
-    
-
-
- 
-
     return (
-
-
-
-
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', minWidth: '600px' }}>
-
-          
-
-
-
             <ChatForm>
-
-                <div style={{  borderRadius: '5px', width: '100%', height: '50vh', flexDirection: 'column' }}>
-
-                   
-
-                    {chatState.chatHistory.map((msg, index) =>
-                        (
-                            <div style={{ display: 'table', width: 'fit - content', backgroundColor: '#213555', marginLeft: '5px', padding: '5px 15px 5px 5px', borderRadius: '10px', margin: '5px 0 0 5px', maxWidth: '200px' }} key={index}>
-                                {msg}
+                <div className="parent" style={{ overflow: 'auto', borderRadius: '5px', width: '100%', height: '50vh', flexDirection: 'column' }}>
+                    {chatHistory.map((item, index) => (
+                        <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <div style={{ backgroundColor: '#1B1A55', borderRadius: '10px', padding: '5px 15px', margin: '5px', maxWidth: '200px' }}>
+                                {item.message}
                             </div>
-                          
-                        ))}
-
-                   
-                    
-                  
-
-
-
-
-
-
-
+                            {item.reply && (
+                                <div style={{ backgroundColor: '#070F2B', borderRadius: '10px', padding: '5px 15px', marginLeft: '40%', maxWidth: '200px' }}>
+                                    {item.reply}
+                                </div>
+                            )}
+                        </div>
+                    ))}
                 </div>
-
-
-
-
-
                 <div>
-
-                   
-
                     <InputField
                         variant="outlined"
                         placeholder="Chat with me"
-                        value={chatState.message}
-                        onChange={handleMessageChange}
+                        value={message}
+                        onChange={MessageChanged}
                         onKeyPress={(event) => {
                             if (event.key === 'Enter') {
-                                handleSubmit();
+                                SubmitMessage();
                             }
                         }}
                     />
-
-             
-
-                    <ChatButton variant="contained" onClick={handleSubmit}>
+                    <ChatButton variant="contained" onClick={SubmitMessage}>
                         Send
                     </ChatButton>
-
                 </div>
-
-              
-      
             </ChatForm>
         </div>
     );
-}
+} 
 
 export default Chatform;
