@@ -15,13 +15,15 @@ namespace chatbot.Repository
         {
             var convo = openAIAPI.Chat.CreateConversation(request);
 
-
+           
                 convo.AppendUserInput(message);
      
                 
                   
 
             var result = await convo.GetResponseFromChatbotAsync();
+
+
             return result;
         }
 
