@@ -10,7 +10,7 @@ namespace chatbot.Model
         {
 
             this.Model = OpenAI_API.Models.Model.ChatGPTTurbo;
-            this.MaxTokens = 500;
+            this.MaxTokens = 200;
             this.PresencePenalty = 0;
        
           

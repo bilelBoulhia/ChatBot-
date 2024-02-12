@@ -13,6 +13,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<gptInterface, gptRepo>();
 builder.Services.AddSingleton<Request>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("https://localhost:5173")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
 
 var app = builder.Build();
 
@@ -32,5 +40,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.Run();

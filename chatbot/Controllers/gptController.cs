@@ -1,6 +1,7 @@
 ﻿
 using chatbot.Interfaces;
 using chatbot.Model;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using OpenAI_API.Chat;
 
 namespace chatbot.Controllers
 {
+    [EnableCors()]
     [Route("api/[controller]")]
     [ApiController]
     public class gptController : ControllerBase
@@ -20,18 +22,17 @@ namespace chatbot.Controllers
         private readonly gptInterface _gptInterface;
         private readonly IConfiguration _configuration;
         private readonly Request _request;
+      
 
 
-
-        public gptController(gptInterface gptInterface, IConfiguration configuration)
+        public gptController(gptInterface gptInterface, IConfiguration configuration )
         {
 
 
             this._configuration = configuration;
             this._request = new Request();
             this._gptInterface = gptInterface;
-    
-            
+                   
         }
 
      
@@ -40,7 +41,7 @@ namespace chatbot.Controllers
 
        
         [HttpPost]
-        public async Task<ActionResult> Post([FromQuery] string message)
+        public async Task<ActionResult> Post([FromQuery] string message )
         {
             var openai = new OpenAIAPI(_configuration["AppSettings:ApiKey"]);
 
